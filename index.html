@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pos Komisyon Hesaplayıcı</title>
+    <title>Pos Komisyon Hesaplayıcı Pro</title>
     <style>
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
             --danger: #ef4444;
             --danger-bg: #fee2e2;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
             --bg-body: #f8fafc;
             --bg-card: #ffffff;
             --text-main: #1e293b;
@@ -18,10 +22,7 @@
             --radius: 16px;
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -60,9 +61,7 @@
             letter-spacing: -0.5px;
         }
 
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
+        .form-group { margin-bottom: 1.25rem; }
 
         label {
             display: block;
@@ -85,9 +84,7 @@
             transition: all 0.2s ease;
         }
 
-        .select-wrapper {
-            position: relative;
-        }
+        .select-wrapper { position: relative; }
         .select-wrapper::after {
             content: "▼";
             font-size: 0.8rem;
@@ -104,6 +101,48 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
+
+        /* Toggle Switch Stili */
+        .mode-switch {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            position: relative;
+            user-select: none;
+        }
+        
+        .mode-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.3s;
+        }
+
+        .mode-option.active { color: var(--primary); }
+
+        .slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+
+        /* Eğer ikinci seçenek seçiliyse slider sağa kayar */
+        .mode-switch[data-mode="reverse"] .slider { transform: translateX(100%); left: 0; }
+
 
         .btn-group {
             display: grid;
@@ -125,9 +164,7 @@
             transition: transform 0.1s;
         }
 
-        button:active {
-            transform: scale(0.96);
-        }
+        button:active { transform: scale(0.96); }
 
         .btn-calc {
             background-color: var(--primary);
@@ -154,6 +191,32 @@
             animation: slideUp 0.3s ease-out;
         }
 
+        /* Karşılaştırma Kutusu */
+        .comparison-box {
+            background-color: var(--success-bg);
+            border: 1px solid #6ee7b7;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        .comparison-title {
+            color: #047857;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .comparison-text {
+            color: #065f46;
+            font-size: 0.9rem;
+        }
+
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -176,11 +239,8 @@
             color: var(--text-main);
         }
 
-        .val {
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
+        .val { font-weight: 600; color: var(--text-main); }
+        
         .val-total {
             font-size: 1.5rem;
             color: var(--primary);
@@ -204,7 +264,6 @@
             padding-left: 4px;
         }
 
-        /* Yeni eklenen uyarı notu stili */
         .info-note {
             text-align: center;
             font-size: 0.85rem;
@@ -257,7 +316,16 @@
         </div>
 
         <div class="form-group">
-            <label>Tutar (TL)</label>
+            <label>Hesaplama Modu</label>
+            <div class="mode-switch" id="mode-switch" data-mode="normal">
+                <div class="slider"></div>
+                <div class="mode-option active" id="opt-normal" onclick="setMode('normal')">Normal Hesaplama</div>
+                <div class="mode-option" id="opt-reverse" onclick="setMode('reverse')">Tersine (Netten)</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label id="amount-label">Çekilecek Tutar (TL)</label>
             <input type="number" id="amount-input" placeholder="0.00" inputmode="decimal" step="0.01">
             <div id="error-msg" class="error-msg">⚠️ Lütfen geçerli bir tutar girin.</div>
         </div>
@@ -272,18 +340,30 @@
                 <span>Komisyon Oranı</span>
                 <span class="badge" id="rate-display">%0.00</span>
             </div>
+            
             <div class="result-row">
-                <span>Kesinti Tutarı</span>
+                <span id="label-sub">Kesinti Tutarı</span>
                 <span class="val" id="commission-display">0.00 ₺</span>
             </div>
             <div class="result-row main">
-                <span style="font-weight: 600;">Ele Geçecek (Net)</span>
+                <span style="font-weight: 600;" id="label-main">Ele Geçecek (Net)</span>
                 <span class="val-total" id="net-display">0.00 ₺</span>
             </div>
         </div>
 
+        <!-- En Uygun Öneri Kutusu -->
+        <div id="comparison-box" class="comparison-box">
+            <div class="comparison-title">
+                <span>🚀 Daha Uygun Bir Oran Var!</span>
+            </div>
+            <div class="comparison-text" id="comparison-text">
+                X Bankası ile çekim yaparsanız kazancınız Y TL artabilir.
+            </div>
+        </div>
+
         <div class="info-note">
-            ⚠️ Pos oranları her ay güncellenecektir.
+            ⚠️ Pos oranları her ay güncellenecektir. <br>
+            By_Oğuz - Kahramanmaraş
         </div>
 
     </div>
@@ -310,8 +390,18 @@
         comm: document.getElementById('commission-display'),
         net: document.getElementById('net-display'),
         box: document.getElementById('result-box'),
-        err: document.getElementById('error-msg')
+        err: document.getElementById('error-msg'),
+        switch: document.getElementById('mode-switch'),
+        optNormal: document.getElementById('opt-normal'),
+        optReverse: document.getElementById('opt-reverse'),
+        lblAmount: document.getElementById('amount-label'),
+        lblSub: document.getElementById('label-sub'),
+        lblMain: document.getElementById('label-main'),
+        compBox: document.getElementById('comparison-box'),
+        compText: document.getElementById('comparison-text')
     };
+
+    let calculationMode = 'normal'; // 'normal' or 'reverse'
 
     const fmt = new Intl.NumberFormat('tr-TR', {
         style: 'currency',
@@ -319,13 +409,40 @@
         minimumFractionDigits: 2
     });
 
+    function setMode(mode) {
+        calculationMode = mode;
+        els.switch.setAttribute('data-mode', mode);
+        
+        if (mode === 'normal') {
+            els.optNormal.classList.add('active');
+            els.optReverse.classList.remove('active');
+            els.lblAmount.innerText = "Çekilecek Tutar (TL)";
+            els.lblSub.innerText = "Kesinti Tutarı";
+            els.lblMain.innerText = "Ele Geçecek (Net)";
+        } else {
+            els.optReverse.classList.add('active');
+            els.optNormal.classList.remove('active');
+            els.lblAmount.innerText = "Elinize Geçecek Net Tutar (TL)";
+            els.lblSub.innerText = "Eklenecek Komisyon";
+            els.lblMain.innerText = "Karttan Çekilmesi Gereken";
+        }
+        
+        // Mod değişince varsa sonucu tekrar hesapla
+        if (els.amt.value) calculate();
+        else {
+            els.box.classList.remove('active');
+            els.compBox.style.display = 'none';
+        }
+    }
+
     function calculate() {
         const val = els.amt.value.replace(',', '.');
-        const amount = parseFloat(val);
+        const inputAmount = parseFloat(val);
 
-        if (!amount || amount <= 0) {
+        if (!inputAmount || inputAmount <= 0) {
             els.err.style.display = 'block';
             els.box.classList.remove('active');
+            els.compBox.style.display = 'none';
             return;
         }
 
@@ -333,21 +450,79 @@
         
         const cardName = els.card.value;
         const instIndex = parseInt(els.inst.value) - 1;
-        const rate = rates[cardName][instIndex];
+        const ratePercent = rates[cardName][instIndex];
+        const rateDecimal = ratePercent / 100;
 
-        const comm = amount * (rate / 100);
-        const net = amount - comm;
+        let grossAmount, netAmount, commission;
 
-        els.rate.innerText = `%${rate.toFixed(2)}`;
-        els.comm.innerText = fmt.format(comm);
-        els.net.innerText = fmt.format(net);
+        if (calculationMode === 'normal') {
+            // Normal: Girilen = Brüt
+            grossAmount = inputAmount;
+            commission = grossAmount * rateDecimal;
+            netAmount = grossAmount - commission;
+        } else {
+            // Tersine: Girilen = Net
+            netAmount = inputAmount;
+            // Net = Brüt * (1 - rate) => Brüt = Net / (1 - rate)
+            grossAmount = netAmount / (1 - rateDecimal);
+            commission = grossAmount - netAmount;
+        }
+
+        els.rate.innerText = `%${ratePercent.toFixed(2)}`;
+        els.comm.innerText = fmt.format(commission);
+        
+        // Ekrana basılacak ana değer (Normalde Net, Terste Brüt)
+        if (calculationMode === 'normal') {
+            els.net.innerText = fmt.format(netAmount);
+        } else {
+            els.net.innerText = fmt.format(grossAmount);
+        }
         
         els.box.classList.add('active');
+
+        // Karşılaştırma Analizi Yap
+        checkBestRate(instIndex, ratePercent, grossAmount, netAmount);
+    }
+
+    function checkBestRate(instIndex, currentRate, grossAmount, netAmount) {
+        let bestBank = null;
+        let minRate = currentRate;
+
+        // Tüm bankaları tara
+        for (const [bank, bankRates] of Object.entries(rates)) {
+            if (bankRates[instIndex] < minRate) {
+                minRate = bankRates[instIndex];
+                bestBank = bank;
+            }
+        }
+
+        if (bestBank) {
+            // Ne kadar fark ediyor?
+            // Aynı brüt tutar için diğer bankanın komisyonunu hesapla
+            const otherRateDecimal = minRate / 100;
+            const otherCommission = grossAmount * otherRateDecimal;
+            const otherNet = grossAmount - otherCommission;
+            
+            const profit = otherNet - netAmount;
+
+            // Tersine hesaplamada mantık farklıdır ama basitlik adına net kazanç farkını gösteriyoruz.
+            if (profit > 1) { // 1 TL'den az fark varsa gösterme
+                els.compText.innerHTML = `Eğer <b>${bestBank}</b> kullanırsanız komisyon oranı <b>%${minRate.toFixed(2)}</b> olur ve kasanıza <b>${fmt.format(profit)}</b> daha fazla para girer.`;
+                els.compBox.style.display = 'block';
+            } else {
+                els.compBox.style.display = 'none';
+            }
+        } else {
+            els.compBox.style.display = 'none';
+        }
     }
 
     function clearForm() {
         els.amt.value = '';
+        els.card.selectedIndex = 0;
+        els.inst.selectedIndex = 0;
         els.box.classList.remove('active');
+        els.compBox.style.display = 'none';
         els.err.style.display = 'none';
         els.amt.focus();
     }
