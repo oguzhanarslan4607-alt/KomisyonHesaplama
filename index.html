@@ -42,6 +42,7 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .card {
@@ -50,7 +51,24 @@
             border-radius: var(--radius);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             width: 100%;
+            position: relative;
         }
+
+        /* Ayarlar Butonu */
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-sub);
+            padding: 5px;
+            transition: color 0.3s;
+            z-index: 10;
+        }
+        .settings-btn:hover { color: var(--primary); }
+        .settings-btn svg { width: 24px; height: 24px; }
 
         h1 {
             text-align: center;
@@ -59,6 +77,7 @@
             margin: 0 0 1.5rem 0;
             font-weight: 700;
             letter-spacing: -0.5px;
+            padding-right: 30px; /* Ayarlar butonu için boşluk */
         }
 
         .form-group { margin-bottom: 1.25rem; }
@@ -140,9 +159,7 @@
             z-index: 1;
         }
 
-        /* Eğer ikinci seçenek seçiliyse slider sağa kayar */
         .mode-switch[data-mode="reverse"] .slider { transform: translateX(100%); left: 0; }
-
 
         .btn-group {
             display: grid;
@@ -191,7 +208,6 @@
             animation: slideUp 0.3s ease-out;
         }
 
-        /* Karşılaştırma Kutusu */
         .comparison-box {
             background-color: var(--success-bg);
             border: 1px solid #6ee7b7;
@@ -240,30 +256,11 @@
         }
 
         .val { font-weight: 600; color: var(--text-main); }
+        .val-total { font-size: 1.5rem; color: var(--primary); font-weight: 800; }
+        .badge { background-color: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; }
         
-        .val-total {
-            font-size: 1.5rem;
-            color: var(--primary);
-            font-weight: 800;
-        }
-
-        .badge {
-            background-color: #dbeafe;
-            color: #1e40af;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        .error-msg {
-            color: var(--danger);
-            font-size: 0.9rem;
-            margin-top: 8px;
-            display: none;
-            padding-left: 4px;
-        }
-
+        .error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 8px; display: none; padding-left: 4px; }
+        
         .info-note {
             text-align: center;
             font-size: 0.85rem;
@@ -274,26 +271,99 @@
             font-style: italic;
         }
 
+        /* --- Admin Panel Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: flex-end; /* Mobile bottom sheet style */
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 500px;
+            height: 90vh; /* Neredeyse tam ekran */
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            animation: slideUpModal 0.3s ease-out;
+        }
+
+        @media (min-width: 481px) {
+            .modal-overlay { align-items: center; }
+            .modal-content { height: auto; max-height: 90vh; border-radius: 20px; }
+        }
+
+        @keyframes slideUpModal {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+        
+        .modal-title { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
+        .close-modal { background: none; border: none; font-size: 1.5rem; color: var(--text-sub); cursor: pointer; }
+
+        .admin-rates-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .rate-input-group label { font-size: 0.8rem; margin-bottom: 2px; color: var(--text-sub); }
+        .rate-input-group input { height: 40px; font-size: 0.9rem; }
+
+        .admin-actions {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-save { background-color: var(--success); color: white; }
+        .btn-reset { background-color: #94a3b8; color: white; margin-top: 10px; font-size: 0.9rem; height: 44px; }
+
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="card">
+        <!-- Ayarlar Butonu -->
+        <button class="settings-btn" onclick="openAdminPanel()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        </button>
+
         <h1>Pos Komisyon Hesaplayıcı</h1>
         
         <div class="form-group">
             <label>Kart Ailesi</label>
             <div class="select-wrapper">
                 <select id="card-select">
-                    <option value="Garanti - Bonus">Garanti - Bonus</option>
-                    <option value="YapıKredi - World">YapıKredi - World</option>
-                    <option value="FinansBank - CardFinans">FinansBank - CardFinans</option>
-                    <option value="Akbank - Axess">Akbank - Axess</option>
-                    <option value="Halkbank - Paraf">Halkbank - Paraf</option>
-                    <option value="İş Bankası - Maximum">İş Bankası - Maximum</option>
-                    <option value="Ziraat Bankası - Combo">Ziraat Bankası - Combo</option>
-                    <option value="Kuveyt Türk - Sağlam Kart">Kuveyt Türk - Sağlam Kart</option>
+                    <!-- Javascript ile doldurulacak -->
                 </select>
             </div>
         </div>
@@ -351,27 +421,52 @@
             </div>
         </div>
 
-        <!-- En Uygun Öneri Kutusu -->
         <div id="comparison-box" class="comparison-box">
             <div class="comparison-title">
                 <span>🚀 Daha Uygun Bir Oran Var!</span>
             </div>
-            <div class="comparison-text" id="comparison-text">
-                X Bankası ile çekim yaparsanız kazancınız Y TL artabilir.
-            </div>
+            <div class="comparison-text" id="comparison-text"></div>
         </div>
 
         <div class="info-note">
             ⚠️ Pos oranları her ay güncellenecektir. <br>
             By_Oğuz - Kahramanmaraş
         </div>
+    </div>
+</div>
 
+<!-- Admin Panel Modal -->
+<div class="modal-overlay" id="admin-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">⚙️ Oran Yönetim Paneli</span>
+            <button class="close-modal" onclick="closeAdminPanel()">✕</button>
+        </div>
+        
+        <div class="form-group">
+            <label>Düzenlenecek Banka</label>
+            <div class="select-wrapper">
+                <select id="admin-bank-select" onchange="loadAdminRates()">
+                    <!-- JS ile dolacak -->
+                </select>
+            </div>
+        </div>
+
+        <label style="margin-top:10px; border-bottom:1px solid #eee; padding-bottom:5px;">Komisyon Oranları (%)</label>
+        <div class="admin-rates-grid" id="admin-rates-grid">
+            <!-- JS ile inputlar buraya gelecek -->
+        </div>
+
+        <div class="admin-actions">
+            <button class="btn-save" onclick="saveRates()">Kaydet ve Kapat</button>
+            <button class="btn-reset" onclick="resetToDefaults()">Fabrika Ayarlarına Dön</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // 2026-01-01 Verileri
-    const rates = {
+    // Varsayılan Oranlar (Fabrika Ayarları)
+    const defaultRates = {
         "Garanti - Bonus":          [2.95, 6.11, 7.97, 9.84, 11.71, 13.58, 15.45, 17.32, 18.88],
         "YapıKredi - World":        [2.95, 5.657, 7.526, 9.395, 11.264, 13.133, 15.002, 16.871, 18.74],
         "FinansBank - CardFinans":  [2.95, 5.66, 7.52, 9.40, 11.26, 13.13, 15.00, 16.87, 18.74],
@@ -381,6 +476,9 @@
         "Ziraat Bankası - Combo":   [2.95, 5.33, 6.70, 8.01, 9.47, 10.83, 12.34, 13.61, 15.12],
         "Kuveyt Türk - Sağlam Kart":[2.95, 5.89, 7.62, 9.32, 11.00, 12.64, 14.29, 15.87, 17.41]
     };
+
+    // Aktif Oranlar
+    let rates = {};
 
     const els = {
         card: document.getElementById('card-select'),
@@ -398,17 +496,52 @@
         lblSub: document.getElementById('label-sub'),
         lblMain: document.getElementById('label-main'),
         compBox: document.getElementById('comparison-box'),
-        compText: document.getElementById('comparison-text')
+        compText: document.getElementById('comparison-text'),
+        // Admin Elements
+        modal: document.getElementById('admin-modal'),
+        adminBankSelect: document.getElementById('admin-bank-select'),
+        adminRatesGrid: document.getElementById('admin-rates-grid')
     };
 
-    let calculationMode = 'normal'; // 'normal' or 'reverse'
+    let calculationMode = 'normal';
 
-    const fmt = new Intl.NumberFormat('tr-TR', {
-        style: 'currency',
-        currency: 'TRY',
-        minimumFractionDigits: 2
-    });
+    const fmt = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 2 });
 
+    // Başlangıçta verileri yükle
+    function init() {
+        // LocalStorage kontrolü
+        const stored = localStorage.getItem('posRates');
+        if (stored) {
+            rates = JSON.parse(stored);
+        } else {
+            rates = JSON.parse(JSON.stringify(defaultRates)); // Deep copy
+        }
+
+        populateBankSelects();
+    }
+
+    function populateBankSelects() {
+        // Ana ekran select
+        els.card.innerHTML = '';
+        // Admin ekran select
+        els.adminBankSelect.innerHTML = '';
+
+        for (const bank of Object.keys(rates)) {
+            // Ana ekran
+            const opt1 = document.createElement('option');
+            opt1.value = bank;
+            opt1.text = bank;
+            els.card.appendChild(opt1);
+
+            // Admin ekran
+            const opt2 = document.createElement('option');
+            opt2.value = bank;
+            opt2.text = bank;
+            els.adminBankSelect.appendChild(opt2);
+        }
+    }
+
+    // --- Hesaplama Fonksiyonları ---
     function setMode(mode) {
         calculationMode = mode;
         els.switch.setAttribute('data-mode', mode);
@@ -427,12 +560,13 @@
             els.lblMain.innerText = "Karttan Çekilmesi Gereken";
         }
         
-        // Mod değişince varsa sonucu tekrar hesapla
         if (els.amt.value) calculate();
-        else {
-            els.box.classList.remove('active');
-            els.compBox.style.display = 'none';
-        }
+        else resetUI();
+    }
+
+    function resetUI() {
+        els.box.classList.remove('active');
+        els.compBox.style.display = 'none';
     }
 
     function calculate() {
@@ -441,8 +575,7 @@
 
         if (!inputAmount || inputAmount <= 0) {
             els.err.style.display = 'block';
-            els.box.classList.remove('active');
-            els.compBox.style.display = 'none';
+            resetUI();
             return;
         }
 
@@ -450,20 +583,21 @@
         
         const cardName = els.card.value;
         const instIndex = parseInt(els.inst.value) - 1;
+        
+        // Eğer banka silindiyse veya veri yoksa hata önle
+        if (!rates[cardName]) return;
+
         const ratePercent = rates[cardName][instIndex];
         const rateDecimal = ratePercent / 100;
 
         let grossAmount, netAmount, commission;
 
         if (calculationMode === 'normal') {
-            // Normal: Girilen = Brüt
             grossAmount = inputAmount;
             commission = grossAmount * rateDecimal;
             netAmount = grossAmount - commission;
         } else {
-            // Tersine: Girilen = Net
             netAmount = inputAmount;
-            // Net = Brüt * (1 - rate) => Brüt = Net / (1 - rate)
             grossAmount = netAmount / (1 - rateDecimal);
             commission = grossAmount - netAmount;
         }
@@ -471,7 +605,6 @@
         els.rate.innerText = `%${ratePercent.toFixed(2)}`;
         els.comm.innerText = fmt.format(commission);
         
-        // Ekrana basılacak ana değer (Normalde Net, Terste Brüt)
         if (calculationMode === 'normal') {
             els.net.innerText = fmt.format(netAmount);
         } else {
@@ -479,8 +612,6 @@
         }
         
         els.box.classList.add('active');
-
-        // Karşılaştırma Analizi Yap
         checkBestRate(instIndex, ratePercent, grossAmount, netAmount);
     }
 
@@ -488,7 +619,6 @@
         let bestBank = null;
         let minRate = currentRate;
 
-        // Tüm bankaları tara
         for (const [bank, bankRates] of Object.entries(rates)) {
             if (bankRates[instIndex] < minRate) {
                 minRate = bankRates[instIndex];
@@ -497,16 +627,12 @@
         }
 
         if (bestBank) {
-            // Ne kadar fark ediyor?
-            // Aynı brüt tutar için diğer bankanın komisyonunu hesapla
             const otherRateDecimal = minRate / 100;
             const otherCommission = grossAmount * otherRateDecimal;
             const otherNet = grossAmount - otherCommission;
-            
             const profit = otherNet - netAmount;
 
-            // Tersine hesaplamada mantık farklıdır ama basitlik adına net kazanç farkını gösteriyoruz.
-            if (profit > 1) { // 1 TL'den az fark varsa gösterme
+            if (profit > 1) {
                 els.compText.innerHTML = `Eğer <b>${bestBank}</b> kullanırsanız komisyon oranı <b>%${minRate.toFixed(2)}</b> olur ve kasanıza <b>${fmt.format(profit)}</b> daha fazla para girer.`;
                 els.compBox.style.display = 'block';
             } else {
@@ -521,15 +647,86 @@
         els.amt.value = '';
         els.card.selectedIndex = 0;
         els.inst.selectedIndex = 0;
-        els.box.classList.remove('active');
-        els.compBox.style.display = 'none';
+        resetUI();
         els.err.style.display = 'none';
         els.amt.focus();
+    }
+
+    // --- Admin Panel Fonksiyonları ---
+    function openAdminPanel() {
+        els.modal.classList.add('active');
+        loadAdminRates();
+    }
+
+    function closeAdminPanel() {
+        els.modal.classList.remove('active');
+    }
+
+    function loadAdminRates() {
+        const bank = els.adminBankSelect.value;
+        const bankRates = rates[bank];
+        els.adminRatesGrid.innerHTML = '';
+
+        bankRates.forEach((rate, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'rate-input-group';
+            
+            const label = document.createElement('label');
+            label.innerText = (index + 1) === 1 ? 'Tek Çekim' : (index + 1) + ' Taksit';
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = '0.01';
+            input.value = rate;
+            input.dataset.index = index; // Hangi taksit olduğunu tut
+
+            wrapper.appendChild(label);
+            wrapper.appendChild(input);
+            els.adminRatesGrid.appendChild(wrapper);
+        });
+    }
+
+    function saveRates() {
+        const bank = els.adminBankSelect.value;
+        const inputs = els.adminRatesGrid.querySelectorAll('input');
+        
+        const newRates = [];
+        inputs.forEach(input => {
+            newRates.push(parseFloat(input.value) || 0);
+        });
+
+        // Veriyi güncelle
+        rates[bank] = newRates;
+        
+        // Kaydet
+        localStorage.setItem('posRates', JSON.stringify(rates));
+        
+        alert('Oranlar başarıyla güncellendi!');
+        closeAdminPanel();
+        
+        // Eğer şu an hesaplama ekranında o banka seçiliyse tekrar hesapla
+        if (els.card.value === bank && els.amt.value) {
+            calculate();
+        }
+    }
+
+    function resetToDefaults() {
+        if(confirm('Tüm oranlar fabrika ayarlarına dönecek. Emin misiniz?')) {
+            rates = JSON.parse(JSON.stringify(defaultRates));
+            localStorage.removeItem('posRates');
+            populateBankSelects();
+            loadAdminRates();
+            alert('Fabrika ayarlarına dönüldü.');
+        }
     }
 
     els.amt.addEventListener("keypress", function(e) {
         if (e.key === "Enter") calculate();
     });
+
+    // Başlat
+    init();
+
 </script>
 
 </body>
