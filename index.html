@@ -102,7 +102,6 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        /* Toggle Switch Stili */
         .mode-switch {
             display: flex;
             background: #f1f5f9;
@@ -335,8 +334,20 @@
 </div>
 
 <script>
-    // GÜNCEL BANKA ORANLARI - 01.06.2026 Tarihli Excel Verilerine Göre Güncellendi (Netten Brüte - Toplam Komisyon)
-    const rates = {
+    // 01.06.2026 Excel - "Fiyatlama.csv" (Normal / Brütten Nete) Oranları
+    const ratesNormal = {
+        "Garanti - Bonus":          [4.50, 6.11, 7.97, 9.84, 11.71, 13.58, 15.45, 17.32, 18.88],
+        "YapıKredi - World":        [4.50, 5.657, 7.526, 9.395, 11.264, 13.133, 15.002, 16.871, 18.74],
+        "FinansBank - CardFinans":  [4.50, 5.66, 7.52, 9.40, 11.26, 13.13, 15.00, 16.87, 18.74],
+        "Akbank - Axess":           [4.50, 5.66, 7.53, 9.40, 11.26, 13.13, 15.00, 16.87, 18.74],
+        "Halkbank - Paraf":         [4.50, 5.27, 7.15, 9.03, 10.91, 12.79, 14.67, 16.56, 18.44],
+        "İş Bankası - Maximum":     [4.50, 5.61, 7.47, 9.35, 11.21, 13.08, 14.95, 16.82, 18.69],
+        "Ziraat Bankası - Combo":   [4.50, 5.79, 7.48, 9.38, 10.76, 12.78, 14.64, 16.45, 18.07],
+        "Kuveyt Türk - Sağlam Kart":[4.50, 6.21, 8.08, 9.95, 11.81, 13.68, 15.70, 17.57, 19.44]
+    };
+
+    // 01.06.2026 Excel - "Netten Brüte.csv" (Tersine) Oranları
+    const ratesReverse = {
         "Garanti - Bonus":          [2.95, 5.65, 7.70, 9.85, 10.80, 12.47, 14.18, 15.90, 17.65],
         "YapıKredi - World":        [2.95, 5.66, 7.53, 9.40, 11.26, 13.13, 15.00, 16.87, 18.74],
         "FinansBank - CardFinans":  [2.95, 5.66, 7.52, 9.40, 11.26, 13.13, 15.00, 16.87, 18.74],
@@ -370,14 +381,13 @@
 
     const fmt = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 2 });
 
-    // Sayfa Yüklendiğinde
     function init() {
         populateBankSelects();
     }
 
     function populateBankSelects() {
         els.card.innerHTML = '';
-        for (const bank of Object.keys(rates)) {
+        for (const bank of Object.keys(ratesNormal)) {
             const opt = document.createElement('option');
             opt.value = bank;
             opt.text = bank;
@@ -427,9 +437,12 @@
         const cardName = els.card.value;
         const instIndex = parseInt(els.inst.value) - 1;
         
-        if (!rates[cardName]) return;
+        // Aktif moda göre doğru oran tablosunu seçiyoruz
+        const activeRates = calculationMode === 'normal' ? ratesNormal : ratesReverse;
+        
+        if (!activeRates[cardName]) return;
 
-        const ratePercent = rates[cardName][instIndex];
+        const ratePercent = activeRates[cardName][instIndex];
         const rateDecimal = ratePercent / 100;
 
         let grossAmount, netAmount, commission;
@@ -454,14 +467,14 @@
         }
         
         els.box.classList.add('active');
-        checkBestRate(instIndex, ratePercent, grossAmount, netAmount);
+        checkBestRate(instIndex, ratePercent, grossAmount, netAmount, activeRates);
     }
 
-    function checkBestRate(instIndex, currentRate, grossAmount, netAmount) {
+    function checkBestRate(instIndex, currentRate, grossAmount, netAmount, activeRates) {
         let bestBank = null;
         let minRate = currentRate;
 
-        for (const [bank, bankRates] of Object.entries(rates)) {
+        for (const [bank, bankRates] of Object.entries(activeRates)) {
             if (bankRates[instIndex] < minRate) {
                 minRate = bankRates[instIndex];
                 bestBank = bank;
