@@ -162,6 +162,70 @@
             box-shadow: 0 0 0 4px rgba(36, 87, 214, 0.12);
         }
 
+        .bank-picker {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 132px;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .bank-logo-card {
+            background: linear-gradient(180deg, #fff, #f7fbff);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            min-height: 54px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .bank-logo-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--logo-bg, #eef2ff);
+            color: var(--logo-color, var(--primary));
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            font-size: 0.74rem;
+            font-weight: 850;
+            overflow: hidden;
+        }
+
+        .bank-logo-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+            background: #fff;
+        }
+
+        .bank-logo-copy {
+            min-width: 0;
+        }
+
+        .bank-logo-copy span {
+            display: block;
+            color: var(--text-sub);
+            font-size: 0.7rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 3px;
+        }
+
+        .bank-logo-copy strong {
+            display: block;
+            color: var(--text-main);
+            font-size: 0.78rem;
+            line-height: 1.15;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .btn-group {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -295,6 +359,26 @@
             border-top: 1px solid var(--border);
             font-style: italic;
         }
+
+        @media (max-width: 430px) {
+            .container {
+                padding: 14px;
+            }
+
+            .hero,
+            .form-shell {
+                padding: 20px;
+            }
+
+            .hero-metrics,
+            .bank-picker {
+                grid-template-columns: 1fr;
+            }
+
+            .bank-logo-card {
+                min-height: 58px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -324,9 +408,21 @@
         <div class="form-shell">
             <div class="form-group">
                 <label>Kart Ailesi</label>
-                <div class="select-wrapper">
-                    <select id="card-select">
-                        </select>
+                <div class="bank-picker">
+                    <div class="select-wrapper">
+                        <select id="card-select">
+                            </select>
+                    </div>
+                    <div class="bank-logo-card" id="bank-logo-card">
+                        <div class="bank-logo-mark" id="bank-logo-mark">
+                            <img id="bank-logo-img" alt="" loading="lazy">
+                            <span id="bank-logo-fallback">GB</span>
+                        </div>
+                        <div class="bank-logo-copy">
+                            <span>Banka logosu</span>
+                            <strong id="bank-logo-name">Garanti</strong>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -407,12 +503,76 @@
         "Kuveyt Türk - Sağlam Kart":[4.50, 6.21, 8.08, 9.95, 11.81, 13.68, 15.70, 17.57, 19.44]
     };
 
+    const bankLogos = {
+        "Garanti - Bonus": {
+            name: "Garanti BBVA",
+            short: "GB",
+            domain: "garantibbva.com.tr",
+            color: "#137a44",
+            bg: "#e8f7ee"
+        },
+        "YapıKredi - World": {
+            name: "Yapı Kredi",
+            short: "YK",
+            domain: "yapikredi.com.tr",
+            color: "#102a83",
+            bg: "#eaf0ff"
+        },
+        "FinansBank - CardFinans": {
+            name: "QNB",
+            short: "QNB",
+            domain: "qnb.com.tr",
+            color: "#6d1d5f",
+            bg: "#f6eafb"
+        },
+        "Akbank - Axess": {
+            name: "Akbank",
+            short: "AK",
+            domain: "akbank.com",
+            color: "#d71920",
+            bg: "#fff0f0"
+        },
+        "Halkbank - Paraf": {
+            name: "Halkbank",
+            short: "HB",
+            domain: "halkbank.com.tr",
+            color: "#1155a3",
+            bg: "#eaf4ff"
+        },
+        "İş Bankası - Maximum": {
+            name: "İş Bankası",
+            short: "İŞ",
+            domain: "isbank.com.tr",
+            color: "#123c8c",
+            bg: "#edf4ff"
+        },
+        "Ziraat Bankası - Combo": {
+            name: "Ziraat",
+            short: "ZB",
+            domain: "ziraatbank.com.tr",
+            color: "#d71920",
+            bg: "#fff0f0"
+        },
+        "Kuveyt Türk - Sağlam Kart": {
+            name: "Kuveyt Türk",
+            short: "KT",
+            domain: "kuveytturk.com.tr",
+            color: "#0f7a3f",
+            bg: "#eaf7ef"
+        }
+    };
+
     const els = {
         card: document.getElementById('card-select'),
         inst: document.getElementById('installment-select'),
         amt: document.getElementById('amount-input'),
         rate: document.getElementById('rate-display'),
         selectedRate: document.getElementById('selected-rate'),
+        bankLogoCard: document.getElementById('bank-logo-card'),
+        bankLogoMark: document.getElementById('bank-logo-mark'),
+        bankLogoImg: document.getElementById('bank-logo-img'),
+        bankLogoFallback: document.getElementById('bank-logo-fallback'),
+        bankLogoName: document.getElementById('bank-logo-name'),
         comm: document.getElementById('commission-display'),
         net: document.getElementById('net-display'),
         box: document.getElementById('result-box'),
@@ -428,6 +588,7 @@
     function init() {
         populateBankSelects();
         updateSelectedRate();
+        updateBankLogo();
     }
 
     function populateBankSelects() {
@@ -459,6 +620,21 @@
         els.selectedRate.innerText = ratePercent === null ? '%0.00' : `%${ratePercent.toFixed(2)}`;
 
         if (els.amt.value) calculate();
+    }
+
+    function updateBankLogo() {
+        const logo = bankLogos[els.card.value];
+
+        if (!logo) return;
+
+        els.bankLogoCard.style.setProperty('--logo-bg', logo.bg);
+        els.bankLogoCard.style.setProperty('--logo-color', logo.color);
+        els.bankLogoFallback.textContent = logo.short;
+        els.bankLogoName.textContent = logo.name;
+        els.bankLogoImg.alt = `${logo.name} logosu`;
+        els.bankLogoImg.style.display = 'block';
+        els.bankLogoFallback.style.display = 'none';
+        els.bankLogoImg.src = `https://www.google.com/s2/favicons?domain=${logo.domain}&sz=64`;
     }
 
     function renderComparisonMessage(parts) {
@@ -550,6 +726,7 @@
         els.card.selectedIndex = 0;
         els.inst.selectedIndex = 0;
         updateSelectedRate();
+        updateBankLogo();
         resetUI();
         els.err.style.display = 'none';
         els.amt.focus();
@@ -558,8 +735,15 @@
     els.amt.addEventListener("keypress", function(e) {
         if (e.key === "Enter") calculate();
     });
-    els.card.addEventListener('change', updateSelectedRate);
+    els.card.addEventListener('change', function() {
+        updateSelectedRate();
+        updateBankLogo();
+    });
     els.inst.addEventListener('change', updateSelectedRate);
+    els.bankLogoImg.addEventListener('error', function() {
+        els.bankLogoImg.style.display = 'none';
+        els.bankLogoFallback.style.display = 'block';
+    });
     els.calculateButton.addEventListener('click', calculate);
     els.clearButton.addEventListener('click', clearForm);
 
