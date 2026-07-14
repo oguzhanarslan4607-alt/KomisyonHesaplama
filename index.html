@@ -2,23 +2,25 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pos Komisyon Hesaplayıcı Pro</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --success: #10b981;
+            --primary: #2457d6;
+            --primary-dark: #173b94;
+            --secondary: #0f766e;
+            --accent: #f59e0b;
+            --success: #059669;
             --success-bg: #ecfdf5;
-            --danger: #ef4444;
+            --danger: #dc2626;
             --danger-bg: #fee2e2;
             --warning: #f59e0b;
             --warning-bg: #fffbeb;
-            --bg-body: #f8fafc;
+            --bg-body: #eef4fb;
             --bg-card: #ffffff;
-            --text-main: #1e293b;
-            --text-sub: #64748b;
-            --border: #e2e8f0;
+            --text-main: #172033;
+            --text-sub: #667085;
+            --border: #d9e3ef;
             --radius: 16px;
         }
 
@@ -26,7 +28,10 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
+            background:
+                linear-gradient(135deg, rgba(36, 87, 214, 0.10), rgba(15, 118, 110, 0.08) 48%, rgba(245, 158, 11, 0.08)),
+                repeating-linear-gradient(90deg, rgba(23, 32, 51, 0.035) 0 1px, transparent 1px 48px),
+                var(--bg-body);
             color: var(--text-main);
             margin: 0;
             padding: 0;
@@ -37,8 +42,8 @@
 
         .container {
             width: 100%;
-            max-width: 480px;
-            padding: 20px;
+            max-width: 540px;
+            padding: 24px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -46,19 +51,73 @@
 
         .card {
             background-color: var(--bg-card);
-            padding: 24px;
-            border-radius: var(--radius);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(217, 227, 239, 0.9);
+            border-radius: 22px;
+            box-shadow: 0 24px 60px rgba(23, 32, 51, 0.14);
+            overflow: hidden;
             width: 100%;
         }
 
+        .hero {
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 30%),
+                linear-gradient(135deg, #172033, #2457d6 58%, #0f766e);
+            color: white;
+            padding: 28px 24px 24px;
+        }
+
+        .brand-kicker {
+            color: #fbbf24;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            margin-bottom: 10px;
+        }
+
         h1 {
-            text-align: center;
-            color: var(--primary);
-            font-size: 1.5rem;
-            margin: 0 0 1.5rem 0;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            color: inherit;
+            font-size: 1.85rem;
+            line-height: 1.12;
+            margin: 0;
+            font-weight: 800;
+        }
+
+        .hero-copy {
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 0.96rem;
+            line-height: 1.5;
+            margin: 10px 0 0;
+        }
+
+        .hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .metric span {
+            display: block;
+            color: rgba(255, 255, 255, 0.68);
+            font-size: 0.72rem;
+            margin-bottom: 4px;
+        }
+
+        .metric strong {
+            display: block;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .form-shell {
+            padding: 24px;
         }
 
         .form-group { margin-bottom: 1.25rem; }
@@ -73,12 +132,12 @@
 
         select, input {
             width: 100%;
-            height: 50px;
+            height: 54px;
             padding: 0 16px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
             font-size: 16px;
-            background-color: #fff;
+            background-color: #fbfdff;
             color: var(--text-main);
             appearance: none;
             transition: all 0.2s ease;
@@ -99,53 +158,15 @@
         select:focus, input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(36, 87, 214, 0.12);
         }
-
-        .mode-switch {
-            display: flex;
-            background: #f1f5f9;
-            padding: 4px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            position: relative;
-            user-select: none;
-        }
-        
-        .mode-option {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-sub);
-            cursor: pointer;
-            z-index: 2;
-            transition: color 0.3s;
-        }
-
-        .mode-option.active { color: var(--primary); }
-
-        .slider {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            width: calc(50% - 4px);
-            height: calc(100% - 8px);
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            z-index: 1;
-        }
-
-        .mode-switch[data-mode="reverse"] .slider { transform: translateX(100%); left: 0; }
 
         .btn-group {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 12px;
-            margin-top: 10px;
+            margin-top: 14px;
         }
 
         button {
@@ -164,9 +185,9 @@
         button:active { transform: scale(0.96); }
 
         .btn-calc {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 12px 24px rgba(36, 87, 214, 0.22);
         }
 
         .btn-clear {
@@ -174,11 +195,35 @@
             color: var(--danger);
         }
 
+        .rate-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 14px;
+            padding: 13px 14px;
+            margin-bottom: 1.25rem;
+        }
+
+        .rate-strip span {
+            color: var(--text-sub);
+            font-size: 0.86rem;
+            font-weight: 700;
+        }
+
+        .rate-strip strong {
+            color: var(--primary-dark);
+            font-size: 1.12rem;
+        }
+
         .result-box {
-            background-color: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 12px;
-            padding: 20px;
+            background: linear-gradient(180deg, #f7fbff, #eef7ff);
+            border: 1px solid #b9d7ff;
+            border-radius: 16px;
+            padding: 18px;
             margin-top: 24px;
             display: none;
         }
@@ -197,7 +242,7 @@
             display: none;
             animation: slideUp 0.4s ease-out;
         }
-        
+
         .comparison-title {
             color: #047857;
             font-weight: 700;
@@ -230,17 +275,17 @@
         .result-row.main {
             margin-top: 16px;
             padding-top: 16px;
-            border-top: 2px dashed #bfdbfe;
+            border-top: 1px solid #bfdbfe;
             margin-bottom: 0;
             color: var(--text-main);
         }
 
         .val { font-weight: 600; color: var(--text-main); }
-        .val-total { font-size: 1.5rem; color: var(--primary); font-weight: 800; }
-        .badge { background-color: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; }
-        
+        .val-total { font-size: 1.65rem; color: var(--primary); font-weight: 850; }
+        .badge { background-color: #dbeafe; color: #1e40af; padding: 5px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 800; }
+
         .error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 8px; display: none; padding-left: 4px; }
-        
+
         .info-note {
             text-align: center;
             font-size: 0.85rem;
@@ -256,79 +301,95 @@
 
 <div class="container">
     <div class="card">
-        <h1>Pos Komisyon Hesaplayıcı</h1>
-        
-        <div class="form-group">
-            <label>Kart Ailesi</label>
-            <div class="select-wrapper">
-                <select id="card-select">
+        <div class="hero">
+            <div class="brand-kicker">POS ORAN PANELİ</div>
+            <h1>Pos Komisyon Hesaplayıcı</h1>
+            <p class="hero-copy">Çekilecek tutara göre komisyon kesintisini ve kasaya geçecek net tutarı anında hesaplayın.</p>
+            <div class="hero-metrics">
+                <div class="metric">
+                    <span>Banka</span>
+                    <strong>8 seçenek</strong>
+                </div>
+                <div class="metric">
+                    <span>Taksit</span>
+                    <strong>1-9 arası</strong>
+                </div>
+                <div class="metric">
+                    <span>Güncel</span>
+                    <strong>Haziran 2026</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-shell">
+            <div class="form-group">
+                <label>Kart Ailesi</label>
+                <div class="select-wrapper">
+                    <select id="card-select">
+                        </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Taksit Sayısı</label>
+                <div class="select-wrapper">
+                    <select id="installment-select">
+                        <option value="1">Tek Çekim</option>
+                        <option value="2">2 Taksit</option>
+                        <option value="3">3 Taksit</option>
+                        <option value="4">4 Taksit</option>
+                        <option value="5">5 Taksit</option>
+                        <option value="6">6 Taksit</option>
+                        <option value="7">7 Taksit</option>
+                        <option value="8">8 Taksit</option>
+                        <option value="9">9 Taksit</option>
                     </select>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label>Taksit Sayısı</label>
-            <div class="select-wrapper">
-                <select id="installment-select">
-                    <option value="1">Tek Çekim</option>
-                    <option value="2">2 Taksit</option>
-                    <option value="3">3 Taksit</option>
-                    <option value="4">4 Taksit</option>
-                    <option value="5">5 Taksit</option>
-                    <option value="6">6 Taksit</option>
-                    <option value="7">7 Taksit</option>
-                    <option value="8">8 Taksit</option>
-                    <option value="9">9 Taksit</option>
-                </select>
+            <div class="rate-strip">
+                <span>Seçili komisyon oranı</span>
+                <strong id="selected-rate">%0.00</strong>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label>Hesaplama Modu</label>
-            <div class="mode-switch" id="mode-switch" data-mode="normal">
-                <div class="slider"></div>
-                <div class="mode-option active" id="opt-normal" onclick="setMode('normal')">Normal Hesaplama</div>
-                <div class="mode-option" id="opt-reverse" onclick="setMode('reverse')">Tersine (Netten)</div>
+            <div class="form-group">
+                <label id="amount-label">Çekilecek Tutar (TL)</label>
+                <input type="number" id="amount-input" placeholder="0.00" inputmode="decimal" step="0.01">
+                <div id="error-msg" class="error-msg">⚠️ Lütfen geçerli bir tutar girin.</div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label id="amount-label">Çekilecek Tutar (TL)</label>
-            <input type="number" id="amount-input" placeholder="0.00" inputmode="decimal" step="0.01">
-            <div id="error-msg" class="error-msg">⚠️ Lütfen geçerli bir tutar girin.</div>
-        </div>
-
-        <div class="btn-group">
-            <button class="btn-calc" onclick="calculate()">HESAPLA</button>
-            <button class="btn-clear" onclick="clearForm()">Temizle</button>
-        </div>
-
-        <div id="result-box" class="result-box">
-            <div class="result-row">
-                <span>Komisyon Oranı</span>
-                <span class="badge" id="rate-display">%0.00</span>
+            <div class="btn-group">
+                <button type="button" class="btn-calc" id="calculate-button">HESAPLA</button>
+                <button type="button" class="btn-clear" id="clear-button">Temizle</button>
             </div>
-            
-            <div class="result-row">
-                <span id="label-sub">Kesinti Tutarı</span>
-                <span class="val" id="commission-display">0.00 ₺</span>
-            </div>
-            <div class="result-row main">
-                <span style="font-weight: 600;" id="label-main">Ele Geçecek (Net)</span>
-                <span class="val-total" id="net-display">0.00 ₺</span>
-            </div>
-        </div>
 
-        <div id="comparison-box" class="comparison-box">
-            <div class="comparison-title">
-                <span>🚀 Daha Uygun Bir Oran Var!</span>
-            </div>
-            <div class="comparison-text" id="comparison-text"></div>
-        </div>
+            <div id="result-box" class="result-box">
+                <div class="result-row">
+                    <span>Komisyon Oranı</span>
+                    <span class="badge" id="rate-display">%0.00</span>
+                </div>
 
-        <div class="info-note">
-            ⚠️ Pos oranları her ay güncellenecektir. <br>
-            By_Oğuz - Kahramanmaraş
+                <div class="result-row">
+                    <span id="label-sub">Kesinti Tutarı</span>
+                    <span class="val" id="commission-display">0.00 ₺</span>
+                </div>
+                <div class="result-row main">
+                    <span style="font-weight: 600;" id="label-main">Ele Geçecek (Net)</span>
+                    <span class="val-total" id="net-display">0.00 ₺</span>
+                </div>
+            </div>
+
+            <div id="comparison-box" class="comparison-box">
+                <div class="comparison-title">
+                    <span>🚀 Daha Uygun Bir Oran Var!</span>
+                </div>
+                <div class="comparison-text" id="comparison-text"></div>
+            </div>
+
+            <div class="info-note">
+                ⚠️ Pos oranları her ay güncellenecektir. <br>
+                By_Oğuz - Kahramanmaraş
+            </div>
         </div>
     </div>
 </div>
@@ -346,43 +407,27 @@
         "Kuveyt Türk - Sağlam Kart":[4.50, 6.21, 8.08, 9.95, 11.81, 13.68, 15.70, 17.57, 19.44]
     };
 
-    // 01.06.2026 Excel - "Netten Brüte.csv" (Tersine) Oranları
-    const ratesReverse = {
-        "Garanti - Bonus":          [2.95, 5.65, 7.70, 9.85, 10.80, 12.47, 14.18, 15.90, 17.65],
-        "YapıKredi - World":        [2.95, 5.66, 7.53, 9.40, 11.26, 13.13, 15.00, 16.87, 18.74],
-        "FinansBank - CardFinans":  [2.95, 5.66, 7.52, 9.40, 11.26, 13.13, 15.00, 16.87, 18.74],
-        "Akbank - Axess":           [2.95, 5.66, 7.53, 9.40, 11.26, 13.13, 15.00, 16.87, 18.74],
-        "Halkbank - Paraf":         [2.95, 5.27, 7.15, 9.03, 10.91, 12.79, 14.67, 16.56, 18.44],
-        "İş Bankası - Maximum":     [2.95, 5.61, 7.48, 9.35, 11.21, 13.08, 14.95, 16.82, 18.69],
-        "Ziraat Bankası - Combo":   [2.95, 5.33, 6.70, 8.01, 9.47, 10.83, 12.34, 13.61, 15.12],
-        "Kuveyt Türk - Sağlam Kart":[2.95, 5.89, 7.62, 9.32, 11.00, 12.64, 14.29, 15.87, 17.41]
-    };
-
     const els = {
         card: document.getElementById('card-select'),
         inst: document.getElementById('installment-select'),
         amt: document.getElementById('amount-input'),
         rate: document.getElementById('rate-display'),
+        selectedRate: document.getElementById('selected-rate'),
         comm: document.getElementById('commission-display'),
         net: document.getElementById('net-display'),
         box: document.getElementById('result-box'),
         err: document.getElementById('error-msg'),
-        switch: document.getElementById('mode-switch'),
-        optNormal: document.getElementById('opt-normal'),
-        optReverse: document.getElementById('opt-reverse'),
-        lblAmount: document.getElementById('amount-label'),
-        lblSub: document.getElementById('label-sub'),
-        lblMain: document.getElementById('label-main'),
+        calculateButton: document.getElementById('calculate-button'),
+        clearButton: document.getElementById('clear-button'),
         compBox: document.getElementById('comparison-box'),
         compText: document.getElementById('comparison-text')
     };
-
-    let calculationMode = 'normal';
 
     const fmt = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 2 });
 
     function init() {
         populateBankSelects();
+        updateSelectedRate();
     }
 
     function populateBankSelects() {
@@ -395,31 +440,39 @@
         }
     }
 
-    function setMode(mode) {
-        calculationMode = mode;
-        els.switch.setAttribute('data-mode', mode);
-        
-        if (mode === 'normal') {
-            els.optNormal.classList.add('active');
-            els.optReverse.classList.remove('active');
-            els.lblAmount.innerText = "Çekilecek Tutar (TL)";
-            els.lblSub.innerText = "Kesinti Tutarı";
-            els.lblMain.innerText = "Ele Geçecek (Net)";
-        } else {
-            els.optReverse.classList.add('active');
-            els.optNormal.classList.remove('active');
-            els.lblAmount.innerText = "Elinize Geçecek Net Tutar (TL)";
-            els.lblSub.innerText = "Eklenecek Komisyon";
-            els.lblMain.innerText = "Karttan Çekilmesi Gereken";
-        }
-        
-        if (els.amt.value) calculate();
-        else resetUI();
-    }
-
     function resetUI() {
         els.box.classList.remove('active');
         els.compBox.style.display = 'none';
+    }
+
+    function getCurrentRate() {
+        const cardName = els.card.value;
+        const instIndex = parseInt(els.inst.value) - 1;
+
+        if (!ratesNormal[cardName]) return null;
+
+        return ratesNormal[cardName][instIndex];
+    }
+
+    function updateSelectedRate() {
+        const ratePercent = getCurrentRate();
+        els.selectedRate.innerText = ratePercent === null ? '%0.00' : `%${ratePercent.toFixed(2)}`;
+
+        if (els.amt.value) calculate();
+    }
+
+    function renderComparisonMessage(parts) {
+        els.compText.replaceChildren();
+
+        for (const part of parts) {
+            if (part.bold) {
+                const bold = document.createElement('b');
+                bold.textContent = part.text;
+                els.compText.appendChild(bold);
+            } else {
+                els.compText.appendChild(document.createTextNode(part.text));
+            }
+        }
     }
 
     function calculate() {
@@ -433,48 +486,33 @@
         }
 
         els.err.style.display = 'none';
-        
+
         const cardName = els.card.value;
         const instIndex = parseInt(els.inst.value) - 1;
-        
-        // Aktif moda göre doğru oran tablosunu seçiyoruz
-        const activeRates = calculationMode === 'normal' ? ratesNormal : ratesReverse;
-        
-        if (!activeRates[cardName]) return;
 
-        const ratePercent = activeRates[cardName][instIndex];
+        if (!ratesNormal[cardName]) return;
+
+        const ratePercent = ratesNormal[cardName][instIndex];
         const rateDecimal = ratePercent / 100;
 
-        let grossAmount, netAmount, commission;
-
-        if (calculationMode === 'normal') {
-            grossAmount = inputAmount;
-            commission = grossAmount * rateDecimal;
-            netAmount = grossAmount - commission;
-        } else {
-            netAmount = inputAmount;
-            grossAmount = netAmount / (1 - rateDecimal);
-            commission = grossAmount - netAmount;
-        }
+        const grossAmount = inputAmount;
+        const commission = grossAmount * rateDecimal;
+        const netAmount = grossAmount - commission;
 
         els.rate.innerText = `%${ratePercent.toFixed(2)}`;
+        els.selectedRate.innerText = `%${ratePercent.toFixed(2)}`;
         els.comm.innerText = fmt.format(commission);
-        
-        if (calculationMode === 'normal') {
-            els.net.innerText = fmt.format(netAmount);
-        } else {
-            els.net.innerText = fmt.format(grossAmount);
-        }
-        
+        els.net.innerText = fmt.format(netAmount);
+
         els.box.classList.add('active');
-        checkBestRate(instIndex, ratePercent, grossAmount, netAmount, activeRates);
+        checkBestRate(instIndex, ratePercent, grossAmount, netAmount);
     }
 
-    function checkBestRate(instIndex, currentRate, grossAmount, netAmount, activeRates) {
+    function checkBestRate(instIndex, currentRate, grossAmount, netAmount) {
         let bestBank = null;
         let minRate = currentRate;
 
-        for (const [bank, bankRates] of Object.entries(activeRates)) {
+        for (const [bank, bankRates] of Object.entries(ratesNormal)) {
             if (bankRates[instIndex] < minRate) {
                 minRate = bankRates[instIndex];
                 bestBank = bank;
@@ -487,12 +525,21 @@
             const otherNet = grossAmount - otherCommission;
             const profit = otherNet - netAmount;
 
-            if (profit > 1) {
-                els.compText.innerHTML = `Eğer <b>${bestBank}</b> kullanırsanız komisyon oranı <b>%${minRate.toFixed(2)}</b> olur ve kasanıza <b>${fmt.format(profit)}</b> daha fazla para girer.`;
-                els.compBox.style.display = 'block';
-            } else {
+            if (profit <= 1) {
                 els.compBox.style.display = 'none';
+                return;
             }
+
+            renderComparisonMessage([
+                { text: 'Eğer ' },
+                { text: bestBank, bold: true },
+                { text: ' kullanırsanız komisyon oranı ' },
+                { text: `%${minRate.toFixed(2)}`, bold: true },
+                { text: ' olur ve kasanıza ' },
+                { text: fmt.format(profit), bold: true },
+                { text: ' daha fazla para girer.' }
+            ]);
+            els.compBox.style.display = 'block';
         } else {
             els.compBox.style.display = 'none';
         }
@@ -502,6 +549,7 @@
         els.amt.value = '';
         els.card.selectedIndex = 0;
         els.inst.selectedIndex = 0;
+        updateSelectedRate();
         resetUI();
         els.err.style.display = 'none';
         els.amt.focus();
@@ -510,6 +558,10 @@
     els.amt.addEventListener("keypress", function(e) {
         if (e.key === "Enter") calculate();
     });
+    els.card.addEventListener('change', updateSelectedRate);
+    els.inst.addEventListener('change', updateSelectedRate);
+    els.calculateButton.addEventListener('click', calculate);
+    els.clearButton.addEventListener('click', clearForm);
 
     init();
 
