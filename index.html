@@ -812,7 +812,21 @@
         }
     }
 
-    function calculate() {
+    function focusResultOnMobile() {
+        if (!window.matchMedia('(max-width: 430px)').matches) return;
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const netRow = els.net.closest('.result-row');
+
+        window.setTimeout(function() {
+            netRow.scrollIntoView({
+                behavior: prefersReducedMotion ? 'auto' : 'smooth',
+                block: 'center'
+            });
+        }, 120);
+    }
+
+    function calculate(shouldFocusResult = false) {
         const val = els.amt.value.replace(',', '.');
         const inputAmount = parseFloat(val);
 
@@ -843,6 +857,8 @@
 
         els.box.classList.add('active');
         checkBestRate(instIndex, ratePercent, grossAmount, netAmount);
+
+        if (shouldFocusResult) focusResultOnMobile();
     }
 
     function checkBestRate(instIndex, currentRate, grossAmount, netAmount) {
@@ -894,7 +910,7 @@
     }
 
     els.amt.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") calculate();
+        if (e.key === "Enter") calculate(true);
     });
     els.card.addEventListener('change', function() {
         updateSelectedRate();
@@ -929,7 +945,9 @@
         els.bankLogoImg.style.display = 'none';
         els.bankLogoFallback.style.display = 'block';
     });
-    els.calculateButton.addEventListener('click', calculate);
+    els.calculateButton.addEventListener('click', function() {
+        calculate(true);
+    });
     els.clearButton.addEventListener('click', clearForm);
 
     init();
