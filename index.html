@@ -162,37 +162,33 @@
             box-shadow: 0 0 0 4px rgba(36, 87, 214, 0.12);
         }
 
-        .bank-picker {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 132px;
-            gap: 12px;
-            align-items: stretch;
+        .bank-select {
+            position: relative;
         }
 
-        .bank-logo-card {
-            background: linear-gradient(180deg, #fff, #f7fbff);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            min-height: 54px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        .bank-select select {
+            padding-left: 60px;
+            padding-right: 44px;
         }
 
         .bank-logo-mark {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
             background: var(--logo-bg, #eef2ff);
             color: var(--logo-color, var(--primary));
             display: grid;
             place-items: center;
-            flex: 0 0 auto;
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            pointer-events: none;
             font-size: 0.74rem;
             font-weight: 850;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(23, 32, 51, 0.10);
         }
 
         .bank-logo-mark img {
@@ -201,29 +197,6 @@
             object-fit: contain;
             padding: 4px;
             background: #fff;
-        }
-
-        .bank-logo-copy {
-            min-width: 0;
-        }
-
-        .bank-logo-copy span {
-            display: block;
-            color: var(--text-sub);
-            font-size: 0.7rem;
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 3px;
-        }
-
-        .bank-logo-copy strong {
-            display: block;
-            color: var(--text-main);
-            font-size: 0.78rem;
-            line-height: 1.15;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .btn-group {
@@ -370,13 +343,8 @@
                 padding: 20px;
             }
 
-            .hero-metrics,
-            .bank-picker {
+            .hero-metrics {
                 grid-template-columns: 1fr;
-            }
-
-            .bank-logo-card {
-                min-height: 58px;
             }
         }
     </style>
@@ -408,21 +376,13 @@
         <div class="form-shell">
             <div class="form-group">
                 <label>Kart Ailesi</label>
-                <div class="bank-picker">
-                    <div class="select-wrapper">
-                        <select id="card-select">
-                            </select>
+                <div class="select-wrapper bank-select" id="bank-logo-card">
+                    <div class="bank-logo-mark" id="bank-logo-mark" aria-hidden="true">
+                        <img id="bank-logo-img" alt="" loading="lazy">
+                        <span id="bank-logo-fallback">GB</span>
                     </div>
-                    <div class="bank-logo-card" id="bank-logo-card">
-                        <div class="bank-logo-mark" id="bank-logo-mark">
-                            <img id="bank-logo-img" alt="" loading="lazy">
-                            <span id="bank-logo-fallback">GB</span>
-                        </div>
-                        <div class="bank-logo-copy">
-                            <span>Banka logosu</span>
-                            <strong id="bank-logo-name">Garanti</strong>
-                        </div>
-                    </div>
+                    <select id="card-select">
+                        </select>
                 </div>
             </div>
 
@@ -572,7 +532,6 @@
         bankLogoMark: document.getElementById('bank-logo-mark'),
         bankLogoImg: document.getElementById('bank-logo-img'),
         bankLogoFallback: document.getElementById('bank-logo-fallback'),
-        bankLogoName: document.getElementById('bank-logo-name'),
         comm: document.getElementById('commission-display'),
         net: document.getElementById('net-display'),
         box: document.getElementById('result-box'),
@@ -630,7 +589,6 @@
         els.bankLogoCard.style.setProperty('--logo-bg', logo.bg);
         els.bankLogoCard.style.setProperty('--logo-color', logo.color);
         els.bankLogoFallback.textContent = logo.short;
-        els.bankLogoName.textContent = logo.name;
         els.bankLogoImg.alt = `${logo.name} logosu`;
         els.bankLogoImg.style.display = 'block';
         els.bankLogoFallback.style.display = 'none';
