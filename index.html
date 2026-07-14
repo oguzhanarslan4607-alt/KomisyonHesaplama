@@ -242,10 +242,14 @@
         }
 
         .bank-logo-mark img {
+            display: block;
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            padding: 4px;
+            min-width: 0;
+            min-height: 0;
+            object-fit: cover;
+            object-position: center;
+            padding: 0;
             background: #fff;
         }
 
@@ -297,8 +301,10 @@
         .bank-option .bank-logo-mark {
             position: static;
             transform: none;
+            flex: 0 0 30px;
             width: 30px;
             height: 30px;
+            aspect-ratio: 1;
             border-radius: 9px;
         }
 
@@ -580,58 +586,56 @@
         "Garanti - Bonus": {
             name: "Garanti BBVA",
             short: "GB",
-            domain: "garantibbva.com.tr",
+            logoUrl: "assets/logos/garanti.png",
             color: "#137a44",
             bg: "#e8f7ee"
         },
         "YapıKredi - World": {
             name: "Yapı Kredi",
             short: "YK",
-            domain: "yapikredi.com.tr",
-            logoUrl: "https://www.google.com/s2/favicons?domain=worldcard.com.tr&sz=64",
+            logoUrl: "assets/logos/yapi-kredi.png",
             color: "#102a83",
             bg: "#eaf0ff"
         },
         "FinansBank - CardFinans": {
             name: "QNB",
             short: "QNB",
-            domain: "qnb.com.tr",
+            logoUrl: "assets/logos/qnb.png",
             color: "#6d1d5f",
             bg: "#f6eafb"
         },
         "Akbank - Axess": {
             name: "Akbank",
             short: "AK",
-            domain: "akbank.com.tr",
+            logoUrl: "assets/logos/akbank.png",
             color: "#d71920",
             bg: "#fff0f0"
         },
         "Halkbank - Paraf": {
             name: "Halkbank",
             short: "HB",
-            domain: "halkbank.com.tr",
+            logoUrl: "assets/logos/halkbank.jpg",
             color: "#1155a3",
             bg: "#eaf4ff"
         },
         "İş Bankası - Maximum": {
             name: "İş Bankası",
             short: "İŞ",
-            domain: "isbank.com.tr",
-            logoUrl: "https://www.google.com/s2/favicons?domain=maximum.com&sz=64",
+            logoUrl: "assets/logos/is-bankasi.jpg",
             color: "#123c8c",
             bg: "#edf4ff"
         },
         "Ziraat Bankası - Combo": {
             name: "Ziraat",
             short: "ZB",
-            domain: "ziraatbank.com.tr",
+            logoUrl: "assets/logos/ziraat.jpg",
             color: "#d71920",
             bg: "#fff0f0"
         },
         "Kuveyt Türk - Sağlam Kart": {
             name: "Kuveyt Türk",
             short: "KT",
-            domain: "kuveytturk.com.tr",
+            logoUrl: "assets/logos/kuveyt-turk.png",
             color: "#0f7a3f",
             bg: "#eaf7ef"
         }
@@ -748,7 +752,7 @@
     }
 
     function getLogoUrl(logo) {
-        return logo.logoUrl || `https://www.google.com/s2/favicons?domain=${logo.domain}&sz=64`;
+        return logo.logoUrl;
     }
 
     function updateBankLogo() {
