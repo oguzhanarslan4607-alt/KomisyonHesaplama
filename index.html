@@ -166,9 +166,55 @@
             position: relative;
         }
 
-        .bank-select select {
-            padding-left: 60px;
-            padding-right: 44px;
+        .bank-select::after {
+            display: none;
+        }
+
+        .native-bank-select {
+            display: none;
+        }
+
+        .bank-trigger {
+            width: 100%;
+            height: 54px;
+            padding: 0 44px 0 60px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background-color: #fbfdff;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: left;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .bank-trigger::after {
+            content: "▼";
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .bank-trigger:focus-visible,
+        .bank-select.open .bank-trigger {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(36, 87, 214, 0.12);
+        }
+
+        .bank-trigger-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .bank-logo-mark {
@@ -191,12 +237,75 @@
             box-shadow: 0 1px 3px rgba(23, 32, 51, 0.10);
         }
 
+        .bank-select .bank-logo-mark {
+            left: 13px;
+        }
+
         .bank-logo-mark img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             padding: 4px;
             background: #fff;
+        }
+
+        .bank-options {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            z-index: 20;
+            max-height: 288px;
+            overflow-y: auto;
+            padding: 6px;
+            margin: 0;
+            list-style: none;
+            background: #fff;
+            border: 1px solid #c7d7ee;
+            border-radius: 14px;
+            box-shadow: 0 18px 38px rgba(23, 32, 51, 0.18);
+        }
+
+        .bank-select.open .bank-options {
+            display: block;
+        }
+
+        .bank-option {
+            width: 100%;
+            height: 46px;
+            padding: 6px 10px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            font-size: 0.96rem;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .bank-option:hover,
+        .bank-option.active {
+            background: #edf4ff;
+            color: var(--primary-dark);
+        }
+
+        .bank-option .bank-logo-mark {
+            position: static;
+            transform: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+        }
+
+        .bank-option-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .btn-group {
@@ -381,7 +490,11 @@
                         <img id="bank-logo-img" alt="" loading="lazy">
                         <span id="bank-logo-fallback">GB</span>
                     </div>
-                    <select id="card-select">
+                    <button type="button" class="bank-trigger" id="bank-trigger" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="bank-trigger-text" id="bank-trigger-text">Garanti - Bonus</span>
+                    </button>
+                    <ul class="bank-options" id="bank-options" role="listbox"></ul>
+                    <select class="native-bank-select" id="card-select" aria-hidden="true" tabindex="-1">
                         </select>
                 </div>
             </div>
@@ -475,6 +588,7 @@
             name: "Yapı Kredi",
             short: "YK",
             domain: "yapikredi.com.tr",
+            logoUrl: "https://www.google.com/s2/favicons?domain=worldcard.com.tr&sz=64",
             color: "#102a83",
             bg: "#eaf0ff"
         },
@@ -529,6 +643,9 @@
         rate: document.getElementById('rate-display'),
         selectedRate: document.getElementById('selected-rate'),
         bankLogoCard: document.getElementById('bank-logo-card'),
+        bankTrigger: document.getElementById('bank-trigger'),
+        bankTriggerText: document.getElementById('bank-trigger-text'),
+        bankOptions: document.getElementById('bank-options'),
         bankLogoMark: document.getElementById('bank-logo-mark'),
         bankLogoImg: document.getElementById('bank-logo-img'),
         bankLogoFallback: document.getElementById('bank-logo-fallback'),
@@ -552,12 +669,60 @@
 
     function populateBankSelects() {
         els.card.innerHTML = '';
+        els.bankOptions.replaceChildren();
+
         for (const bank of Object.keys(ratesNormal)) {
             const opt = document.createElement('option');
             opt.value = bank;
             opt.text = bank;
             els.card.appendChild(opt);
+
+            els.bankOptions.appendChild(createBankOption(bank));
         }
+    }
+
+    function createLogoMark(logo) {
+        const mark = document.createElement('span');
+        const img = document.createElement('img');
+        const fallback = document.createElement('span');
+
+        mark.className = 'bank-logo-mark';
+        mark.style.setProperty('--logo-bg', logo.bg);
+        mark.style.setProperty('--logo-color', logo.color);
+        img.alt = '';
+        img.loading = 'lazy';
+        img.src = getLogoUrl(logo);
+        fallback.textContent = logo.short;
+        fallback.style.display = 'none';
+        img.addEventListener('error', function() {
+            img.style.display = 'none';
+            fallback.style.display = 'block';
+        });
+        mark.append(img, fallback);
+
+        return mark;
+    }
+
+    function createBankOption(bank) {
+        const logo = bankLogos[bank];
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        const text = document.createElement('span');
+
+        item.setAttribute('role', 'option');
+        item.setAttribute('aria-selected', 'false');
+        button.type = 'button';
+        button.className = 'bank-option';
+        button.dataset.bank = bank;
+        text.className = 'bank-option-text';
+        text.textContent = bank;
+        button.append(createLogoMark(logo), text);
+        button.addEventListener('click', function() {
+            selectBank(bank);
+        });
+        item.appendChild(button);
+
+        return item;
     }
 
     function resetUI() {
@@ -581,6 +746,10 @@
         if (els.amt.value) calculate();
     }
 
+    function getLogoUrl(logo) {
+        return logo.logoUrl || `https://www.google.com/s2/favicons?domain=${logo.domain}&sz=64`;
+    }
+
     function updateBankLogo() {
         const logo = bankLogos[els.card.value];
 
@@ -592,7 +761,30 @@
         els.bankLogoImg.alt = `${logo.name} logosu`;
         els.bankLogoImg.style.display = 'block';
         els.bankLogoFallback.style.display = 'none';
-        els.bankLogoImg.src = `https://www.google.com/s2/favicons?domain=${logo.domain}&sz=64`;
+        els.bankLogoImg.src = getLogoUrl(logo);
+        els.bankTriggerText.textContent = els.card.value;
+        updateBankOptionsState();
+    }
+
+    function updateBankOptionsState() {
+        for (const button of els.bankOptions.querySelectorAll('.bank-option')) {
+            const isSelected = button.dataset.bank === els.card.value;
+            button.classList.toggle('active', isSelected);
+            button.parentElement.setAttribute('aria-selected', String(isSelected));
+        }
+    }
+
+    function setBankOptionsOpen(isOpen) {
+        els.bankLogoCard.classList.toggle('open', isOpen);
+        els.bankTrigger.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function selectBank(bank) {
+        els.card.value = bank;
+        updateSelectedRate();
+        updateBankLogo();
+        setBankOptionsOpen(false);
+        els.bankTrigger.focus();
     }
 
     function renderComparisonMessage(parts) {
@@ -698,6 +890,30 @@
         updateBankLogo();
     });
     els.inst.addEventListener('change', updateSelectedRate);
+    els.bankTrigger.addEventListener('click', function() {
+        setBankOptionsOpen(!els.bankLogoCard.classList.contains('open'));
+    });
+    els.bankTrigger.addEventListener('keydown', function(e) {
+        const currentOptions = [...els.bankOptions.querySelectorAll('.bank-option')];
+        const currentIndex = currentOptions.findIndex(option => option.dataset.bank === els.card.value);
+
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const direction = e.key === 'ArrowDown' ? 1 : -1;
+            const nextIndex = (currentIndex + direction + currentOptions.length) % currentOptions.length;
+            selectBank(currentOptions[nextIndex].dataset.bank);
+            setBankOptionsOpen(true);
+        }
+
+        if (e.key === 'Escape') {
+            setBankOptionsOpen(false);
+        }
+    });
+    document.addEventListener('click', function(e) {
+        if (!els.bankLogoCard.contains(e.target)) {
+            setBankOptionsOpen(false);
+        }
+    });
     els.bankLogoImg.addEventListener('error', function() {
         els.bankLogoImg.style.display = 'none';
         els.bankLogoFallback.style.display = 'block';
